@@ -1,0 +1,126 @@
+// ============================================
+// FILE: static/script.js
+// ============================================
+
+// Current Player
+let currentPlayer = "X";
+
+// Game Status
+let gameActive = true;
+
+// Board Array
+let board = ["", "", "", "", "", "", "", "", ""];
+
+// Winning Patterns
+const winPatterns = [
+
+    // Rows
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+
+    // Columns
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+
+    // Diagonals
+    [0, 4, 8],
+    [2, 4, 6]
+];
+
+// DOM Elements
+const cells = document.querySelectorAll(".cell");
+const statusText = document.getElementById("status");
+const currentPlayerText = document.getElementById("currentPlayer");
+const resetButton = document.getElementById("resetBtn");
+
+// Add Click Events
+cells.forEach(cell => {
+    cell.addEventListener("click", handleCellClick);
+});
+
+// Reset Button Event
+resetButton.addEventListener("click", resetGame);
+
+/*
+============================================
+Handle Cell Click
+============================================
+*/
+function handleCellClick() {
+
+    const index = this.getAttribute("data-index");
+
+    // Prevent Invalid Moves
+    if (board[index] !== "" || !gameActive) {
+        return;
+    }
+
+    // Update Board
+    board[index] = currentPlayer;
+
+    // Display Move
+    this.textContent = currentPlayer;
+
+    // Check Winner
+    if (checkWinner()) {
+
+        statusText.textContent = `${currentPlayer} Wins! 🎉`;
+        gameActive = false;
+        return;
+    }
+
+    // Check Draw
+    if (!board.includes("")) {
+
+        statusText.textContent = "It's a Draw!";
+        gameActive = false;
+        return;
+    }
+
+    // Switch Player
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+    // Update UI
+    currentPlayerText.textContent = currentPlayer;
+    statusText.textContent = "Game Active";
+}
+
+/*
+============================================
+Check Winner
+============================================
+*/
+function checkWinner() {
+
+    return winPatterns.some(pattern => {
+
+        return pattern.every(index => {
+            return board[index] === currentPlayer;
+        });
+
+    });
+}
+
+/*
+============================================
+Reset Game
+============================================
+*/
+function resetGame() {
+
+    // Reset Variables
+    board = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    gameActive = true;
+
+    // Clear Cells
+    cells.forEach(cell => {
+        cell.textContent = "";
+    });
+
+    // Reset UI
+    statusText.textContent = "Game Active";
+    currentPlayerText.textContent = currentPlayer;
+}
